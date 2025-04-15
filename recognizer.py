@@ -33,11 +33,11 @@ model.compile(optimizer="adam", loss="sparse_categorical_crossentropy", metrics=
 model.fit(x_train, y_train, epochs=5, validation_data=(x_test, y_test))
 
 # Guardar modelo
-model.save("model/modelo_digits.h5")
+model.save("model/cnn_digits.h5")
 
 #Simplemente carga y devuelve el modelo previamente guardado
 def cargar_modelo():
-    return load_model("model/modelo_digits.h5")
+    return load_model("model/modelo_mnist.h5")
 
 def predecir_imagen(path_imagen, modelo):
     img = Image.open(path_imagen).convert("L").resize((28, 28)) #L es escala de grises
@@ -75,4 +75,4 @@ if __name__ == "__main__":
     model.fit(x_train, y_train, epochs=5, validation_data=(x_test, y_test))
 
     # Guardar modelo
-    model.save("model/modelo_digits.h5")
+    model.save("model/modelo_mnist.h5")
