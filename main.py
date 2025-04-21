@@ -20,7 +20,7 @@ class App:
 
         self.canvas.bind("<B1-Motion>", self.paint)#Vincular el mov del raton con el click izquierdo
 
-        tk.Button(root, text="Guardar como imagen", command=self.guardar).pack(pady=10)#Boton para guardar y predecir
+        tk.Button(root, text="Predecir", command=self.guardar).pack(pady=10)#Boton para guardar y predecir
         tk.Button(root, text="Limpiar", command=self.limpiar).pack() #Boton para limpiar
 
     #Se ejecuta cuando estamo presionando el click izquierdo

@@ -48,6 +48,9 @@ def predecir_imagen(path_imagen, modelo):
     prediccion = modelo.predict(img)
     return np.argmax(prediccion)
 
+def cargar_modelo():
+    return load_model("model/cnn_digits.h5")  # MNIST
+
 if __name__ == "__main__":
     # Cargar dataset de dígitos
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
