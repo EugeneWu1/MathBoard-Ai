@@ -26,15 +26,11 @@ venv\Scripts\activate
 Para Linux/macOS
 source venv/bin/activate
 
+
+
 Instala las dependencias
 
-pip install numpy
-pip install opencv-python
-pip install tensorflow
-pip install pillow
-pip install matplotlib
-pip install tkinter
-
+-pip install numpy opencv-python tensorflow pillow matplotlib
 
 ¿Cómo se usa?
 1. Ejectua el archivo main.py, este cargara las interfaces de tkinter y los modelos, espera un poco.
