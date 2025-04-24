@@ -45,32 +45,96 @@ class CanvasEscritura:
 
 class App:
     def __init__(self, root):
-        self.canvas_A = CanvasEscritura(root, 1, "A")
-        self.canvas_X = CanvasEscritura(root, 2, "X")
-        self.canvas_B = CanvasEscritura(root, 3, "B")
+        # Frame principal que contendrá todo
+        self.main_frame = tk.Frame(root)
+        self.main_frame.pack(padx=10, pady=10)
 
-        # Frame de botones y resultado
-        self.boton_frame = tk.Frame(root)
-        self.boton_frame.pack(pady=10)
+        # Primer canvas (A) - izquierdo
+        self.canvas_A = CanvasEscritura(self.main_frame, 1, "A")
+        
+        # Frame para los botones de operaciones (centro)
+        self.boton_frame = tk.Frame(self.main_frame)
+        self.boton_frame.pack(side=tk.LEFT, padx=20)
+        
+        # Crear botones de operaciones en una disposición 2x2
+        self.boton_sumar = tk.Button(self.boton_frame, text="+", command=lambda: self.set_signo("+"), 
+                                   font=("Comic Sans", 20), width=4, height=2)
+        self.boton_sumar.grid(row=0, column=0, padx=5, pady=5)
+        
+        self.boton_rest = tk.Button(self.boton_frame, text="-", command=lambda: self.set_signo("-"), 
+                                  font=("Comic Sans", 20), width=4, height=2)
+        self.boton_rest.grid(row=0, column=1, padx=5, pady=5)
+        
+        self.boton_multip = tk.Button(self.boton_frame, text="*", command=lambda: self.set_signo("*"), 
+                                     font=("Comic Sans", 20), width=4, height=2)
+        self.boton_multip.grid(row=1, column=0, padx=5, pady=5)
+        
+        self.boton_divi = tk.Button(self.boton_frame, text="/", command=lambda: self.set_signo("/"), 
+                                   font=("Comic Sans", 20), width=4, height=2)
+        self.boton_divi.grid(row=1, column=1, padx=5, pady=5)
+        
+        # Segundo canvas (B) - derecho
+        self.canvas_B = CanvasEscritura(self.main_frame, 2, "B")
 
-        tk.Button(self.boton_frame, text="Predecir", command=self.predecir_todo).pack(side=tk.LEFT, padx=10)
-        tk.Button(self.boton_frame, text="Mostrar Resultado", command=self.mostrar_resultados).pack(side=tk.LEFT)
+        # Frame para el botón = y resultado
+        self.result_frame = tk.Frame(self.main_frame)
+        self.result_frame.pack(side=tk.LEFT, padx=10)
 
-        # Label para mostrar el resultado final
-        self.resultado_label = tk.Label(root, text="=", font=("Comic Sans", 100, "bold"), fg="black")
-        self.resultado_label.pack(pady=20)
+        # Botón = grande
+        self.boton_igual = tk.Button(self.result_frame, text="=", command=self.mostrar_resultados, 
+                                   font=("Comic Sans", 40), width=3, height=2)
+        self.boton_igual.pack(side=tk.LEFT, padx=10)
 
-    def interpretar_operador(self, x):
-        if x in [0, 1, 2]:
-            return "+"
-        elif x in [3, 4, 5]:
-            return "-"
-        elif x in [6, 7]:
-            return "*"
-        elif x in [8, 9]:
-            return "/"
+        # Canvas para mostrar el resultado (del mismo tamaño que los otros canvas)
+        self.resultado_canvas = tk.Canvas(self.result_frame, width=200, height=200, bg="white")
+        self.resultado_canvas.pack(side=tk.LEFT)
+        
+        # Texto del resultado (centrado en el canvas)
+        self.resultado_text = self.resultado_canvas.create_text(100, 100, text="", 
+                                                              font=("Comic Sans", 80, "bold"), 
+                                                              fill="black")
+
+        self.X = None  # Variable para guardar el signo
+
+        # Etiqueta para mostrar el signo seleccionado (X)
+        self.signo_label = tk.Label(root, text="Signo seleccionado: ", font=("Comic Sans", 14))
+        self.signo_label.pack(pady=10)
+
+    def set_signo(self, signo):
+        self.X = signo
+        self.signo_label.config(text=f"Signo seleccionado: {self.X}")
+        print(f"Signo seleccionado: {self.X}")
+
+    def predecir(self):
+        self.canvas_A.predecir()
+        self.canvas_B.predecir()
+
+    def mostrar_resultados(self):
+        self.predecir()  # Primero predecimos los valores
+        
+        A = self.canvas_A.valor
+        B = self.canvas_B.valor
+
+        print(f"\n--- Resultados actuales ---")
+        print(f"A = {A}")
+        print(f"B = {B}")
+
+        if A is not None and B is not None and self.X is not None:
+            operador = self.X
+            operacion_str = f"{A} {operador} {B}"
+            print(f"\nOperación interpretada: {operacion_str}")
+
+            if operador in ["+", "-", "*", "/"]:
+                resultado = self.resolver_operacion(A, operador, B)
+                # Actualizamos el texto en el canvas de resultado
+                self.resultado_canvas.itemconfig(self.resultado_text, text=f"{resultado}")
+                print(f"Resultado: {resultado}")
+            else:
+                self.resultado_canvas.itemconfig(self.resultado_text, text="Error")
+                print("No se puede resolver esta operación (operador no válido para cálculo).")
         else:
-            return "?"
+            self.resultado_canvas.itemconfig(self.resultado_text, text="Error")
+            print("Falta uno o más valores para interpretar la operación.")
 
     def resolver_operacion(self, a, operador, b):
         try:
@@ -82,47 +146,16 @@ class App:
                 return a * b
             elif operador == "/":
                 if b == 0:
-                    return "Error: División por cero"
+                    return "∞"  # Infinito para división por cero
                 return round(a / b, 2)
             else:
-                return "No se puede evaluar esta operación."
+                return "Error"
         except Exception as e:
-            return f"Error al evaluar: {e}"
-
-    def predecir_todo(self):
-        self.canvas_A.predecir()
-        self.canvas_X.predecir()
-        self.canvas_B.predecir()
-
-    def mostrar_resultados(self):
-        A = self.canvas_A.valor
-        X = self.canvas_X.valor
-        B = self.canvas_B.valor
-
-        print(f"\n--- Resultados actuales ---")
-        print(f"A = {A}")
-        print(f"X = {X}")
-        print(f"B = {B}")
-
-        if A is not None and X is not None and B is not None:
-            operador = self.interpretar_operador(X)
-            operacion_str = f"{A} {operador} {B}"
-            print(f"\nOperación interpretada: {operacion_str}")
-
-            if operador in ["+", "-", "*", "/"]:
-                resultado = self.resolver_operacion(A, operador, B)
-                self.resultado_label.config(text=f"{resultado}")
-                print(f"{resultado}")
-            else:
-                self.resultado_label.config(text="Resultado: Operador no válido para calcular")
-                print("No se puede resolver esta operación (operador no válido para cálculo).")
-        else:
-            self.resultado_label.config(text="Resultado: Datos incompletos")
-            print("Falta uno o más valores para interpretar la operación.")
+            return f"Error"
 
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.title("Canvas x3 con Evaluación General y Resultado")
+    root.title("Calculadora con Reconocimiento de Dígitos")
     app = App(root)
     root.mainloop()
